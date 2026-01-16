@@ -69,24 +69,25 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
+  --background: #FFFFFF;
+  --foreground: #121212;
+  --card: #FFFFFF;
+  --card-foreground: #121212;
+  --popover: #FFFFFF;
+  --popover-foreground: #121212;
+  --primary: #5856D6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #F2F2F7;
+  --secondary-foreground: #121212;
+  --muted: #F2F2F7;
+  --muted-foreground: #636366;
+  --accent: #F2F2F7;
+  --accent-foreground: #121212;
+
   --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
+  --border: #E5E5EA;
+  --input: #E5E5EA;
+  --ring: #2563EB;
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -100,27 +101,45 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+
+  /* Custom Minimalist Tokens (90:7:3) */
+  --color-gray-primary: #636366;
+  --color-gray-muted: #8E8E93;
+  --color-divider: #E5E5EA;
+  --color-surface: #F2F2F7;
+  --color-accent: #2563EB;
+  /* Used for Identity/Icons/Strong Highlights */
+  --color-error: #FF3B30;
+  --color-success: #34C759;
+  --color-info: #2563EB;
+
+  /* Logical Mappings */
+  --text-primary: var(--foreground);
+  --text-secondary: var(--color-gray-primary);
+  --text-muted: var(--color-gray-muted);
+  --border-color: var(--color-divider);
+  --bg-portfolio: var(--background);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
+  --background: #121212;
+  --foreground: #F2F2F7;
+  --card: #1C1C1E;
+  --card-foreground: #F2F2F7;
+  --popover: #1C1C1E;
+  --popover-foreground: #F2F2F7;
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #2C2C2E;
+  --secondary-foreground: #F2F2F7;
+  --muted: #1C1C1E;
+  --muted-foreground: #A1A1A6;
+  --accent: #2C2C2E;
+  --accent-foreground: #F2F2F7;
   --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --border: #2C2C2E;
+  --input: #2C2C2E;
+  --ring: #3B82F6;
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -134,6 +153,23 @@
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
+
+  /* Custom Minimalist Tokens (90:7:3) */
+  --color-gray-primary: #A1A1A6;
+  --color-gray-muted: #636366;
+  --color-divider: #2C2C2E;
+  --color-surface: #1C1C1E;
+  --color-accent: #5E5CE6;
+  --color-error: #FF453A;
+  --color-success: #32D74B;
+  --color-info: #0A84FF;
+
+  /* Logical Mappings */
+  --text-primary: var(--foreground);
+  --text-secondary: var(--color-gray-primary);
+  --text-muted: var(--color-gray-muted);
+  --border-color: var(--color-divider);
+  --bg-portfolio: var(--background);
 }
 
 @layer base {
@@ -142,6 +178,54 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+}
+
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  body {
+    background: white !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+
+  .print-hidden {
+    display: none !important;
+  }
+
+  footer,
+  header {
+    display: none !important;
+  }
+
+  main {
+    padding: 1.5cm 2cm !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  .border-slate-900 {
+    border-color: black !important;
+  }
+
+  .text-slate-400,
+  .text-slate-500 {
+    color: #4b5563 !important;
+    /* Ensure readable gray in print */
+  }
+
+  h1,
+  h2,
+  h3 {
+    color: black !important;
+  }
+
+  .break-inside-avoid {
+    break-inside: avoid;
   }
 }

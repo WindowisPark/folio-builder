@@ -13,11 +13,20 @@ export async function updateProfile(formData: FormData) {
 
     const fullName = formData.get('fullName') as string
     const username = formData.get('username') as string
+    const website = formData.get('website') as string
+    const githubUrl = formData.get('githubUrl') as string
+    const linkedinUrl = formData.get('linkedinUrl') as string
 
     // Update Profile
     const { error: profileError } = await supabase
         .from('profiles')
-        .update({ full_name: fullName, username })
+        .update({
+            full_name: fullName,
+            username,
+            website,
+            github_url: githubUrl,
+            linkedin_url: linkedinUrl
+        })
         .eq('id', user.id)
 
     if (profileError) {
@@ -28,7 +37,7 @@ export async function updateProfile(formData: FormData) {
     const title = formData.get('title') as string
     const bio = formData.get('bio') as string
     const slug = formData.get('slug') as string
-    const skills = formData.get('skills') as string // received as a comma-separated string for now
+    const skills = formData.get('skills') as string
 
     // Upsert Portfolio (we assume one per user for now, but RLS checks user_id)
     // First check if portfolio exists to get ID, or just upsert based on user_id if we had a unique constraint on user_id?

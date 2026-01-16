@@ -16,10 +16,10 @@ export function ProjectCard({ name, description, url, imageUrl, techStack, type 
     return (
         <CardWrapper
             {...cardProps}
-            className="group block space-y-4 rounded-xl border border-gray-100 bg-white p-1 hover:shadow-lg transition-all duration-300"
+            className="group block space-y-4 rounded-xl border border-[var(--border-color)] bg-[var(--card)] p-1 hover:shadow-lg transition-all duration-300"
         >
             {/* Image */}
-            <div className="relative aspect-video rounded-lg overflow-hidden bg-gray-50">
+            <div className="relative aspect-video rounded-lg overflow-hidden bg-[var(--color-surface)]">
                 {imageUrl ? (
                     <img
                         src={imageUrl}
@@ -27,8 +27,8 @@ export function ProjectCard({ name, description, url, imageUrl, techStack, type 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                        <span className="text-4xl font-bold text-gray-300">
+                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[var(--background)] to-[var(--color-surface)]">
+                        <span className="text-4xl font-bold text-[var(--text-muted)] opacity-20">
                             {name.charAt(0).toUpperCase()}
                         </span>
                     </div>
@@ -37,8 +37,8 @@ export function ProjectCard({ name, description, url, imageUrl, techStack, type 
                 {/* Type Badge */}
                 {type === 'main' && (
                     <div className="absolute top-3 left-3">
-                        <span className="inline-flex items-center rounded-full bg-blue-500 px-2.5 py-0.5 text-xs font-medium text-white">
-                            주요
+                        <span className="inline-flex items-center rounded-full bg-[var(--primary)] px-2.5 py-0.5 text-xs font-bold text-[var(--primary-foreground)] shadow-lg shadow-blue-500/20 uppercase tracking-tighter">
+                            Featured
                         </span>
                     </div>
                 )}
@@ -46,8 +46,8 @@ export function ProjectCard({ name, description, url, imageUrl, techStack, type 
                 {/* External Link Icon */}
                 {url && (
                     <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <div className="p-1.5 rounded-full bg-white/90 shadow-sm">
-                            <ExternalLink className="w-4 h-4 text-gray-600" />
+                        <div className="p-1.5 rounded-full bg-[var(--background)]/90 shadow-sm">
+                            <ExternalLink className="w-4 h-4 text-[var(--primary)]" />
                         </div>
                     </div>
                 )}
@@ -55,12 +55,12 @@ export function ProjectCard({ name, description, url, imageUrl, techStack, type 
 
             {/* Content */}
             <div className="px-3 pb-4 space-y-2">
-                <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors">
+                <h3 className="font-bold text-lg text-[var(--text-primary)] group-hover:text-[var(--primary)] transition-colors tracking-tight">
                     {name}
                 </h3>
 
                 {description && (
-                    <p className="text-gray-600 text-sm line-clamp-2">
+                    <p className="text-[var(--text-secondary)] text-sm line-clamp-2 leading-relaxed">
                         {description}
                     </p>
                 )}
@@ -70,13 +70,13 @@ export function ProjectCard({ name, description, url, imageUrl, techStack, type 
                         {techStack.slice(0, 5).map((tech, index) => (
                             <span
                                 key={index}
-                                className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700"
+                                className="inline-flex items-center rounded-full bg-[var(--color-surface)] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] border border-[var(--border-color)]"
                             >
                                 {tech}
                             </span>
                         ))}
                         {techStack.length > 5 && (
-                            <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
+                            <span className="inline-flex items-center rounded-full bg-[var(--color-surface)] px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]">
                                 +{techStack.length - 5}
                             </span>
                         )}

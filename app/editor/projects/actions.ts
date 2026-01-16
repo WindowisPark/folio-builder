@@ -99,6 +99,7 @@ export async function createProject(formData: FormData): Promise<{ success: bool
         .from('projects')
         .insert({
             portfolio_id: portfolio.id,
+            user_id: user.id,
             name,
             description,
             url,

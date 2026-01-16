@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { ProjectForm } from './project-form'
 import { getProjects } from './actions'
 import Link from 'next/link'
-import { ArrowLeft } from 'lucide-react'
+import { X, FolderOpen } from 'lucide-react'
 
 export default async function ProjectsPage() {
     const supabase = await createClient()
@@ -18,28 +18,21 @@ export default async function ProjectsPage() {
 
     const { data: projects, error } = await getProjects()
 
-    return (
-        <div className="container mx-auto max-w-3xl py-10 px-4">
-            <div className="mb-8">
-                <Link
-                    href="/editor"
-                    className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-4"
-                >
-                    <ArrowLeft className="w-4 h-4 mr-1" />
-                    프로필 편집으로 돌아가기
-                </Link>
-                <h1 className="text-3xl font-bold tracking-tight">프로젝트 관리</h1>
-                <p className="text-muted-foreground mt-1">
-                    포트폴리오에 표시될 프로젝트를 관리하세요. 주요 프로젝트는 상단에 크게 표시됩니다.
-                </p>
-            </div>
+    const { data: portfolio } = await supabase
+        .from('portfolios')
+        .select('id')
+        .eq('user_id', user.id)
+        .single()
 
+    return (
+        <div className="py-8">
             {error ? (
-                <div className="rounded-md bg-red-50 p-4">
-                    <p className="text-sm text-red-700">{error}</p>
+                <div className="container mx-auto max-w-5xl px-4 rounded-xl bg-red-50 p-6 border border-red-100 flex items-center gap-3 text-red-600">
+                    <X className="w-5 h-5" />
+                    <p className="font-bold">{error}</p>
                 </div>
             ) : (
-                <ProjectForm projects={projects || []} />
+                <ProjectForm projects={projects || []} portfolioId={portfolio?.id || ''} />
             )}
         </div>
     )
