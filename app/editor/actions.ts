@@ -2,6 +2,20 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import * as z from 'zod'
+
+const profileSchema = z.object({
+    fullName: z.string().min(2),
+    username: z.string().min(3),
+    website: z.string().url().or(z.literal('')).optional(),
+    githubUrl: z.string().url().or(z.literal('')).optional(),
+    linkedinUrl: z.string().url().or(z.literal('')).optional(),
+    title: z.string().optional(),
+    bio: z.string().max(500).optional(),
+    slug: z.string().min(3),
+    skills: z.string().optional(),
+    visibility: z.enum(['public', 'friends_only', 'private']).default('public')
+})
 
 export async function updateProfile(formData: FormData) {
     const supabase = await createClient()
@@ -11,21 +25,37 @@ export async function updateProfile(formData: FormData) {
         return { error: 'Not authenticated' }
     }
 
-    const fullName = formData.get('fullName') as string
-    const username = formData.get('username') as string
-    const website = formData.get('website') as string
-    const githubUrl = formData.get('githubUrl') as string
-    const linkedinUrl = formData.get('linkedinUrl') as string
+    const rawData = {
+        fullName: formData.get('fullName') as string,
+        username: formData.get('username') as string,
+        website: formData.get('website') as string,
+        githubUrl: formData.get('githubUrl') as string,
+        linkedinUrl: formData.get('linkedinUrl') as string,
+        title: formData.get('title') as string,
+        bio: formData.get('bio') as string,
+        slug: formData.get('slug') as string,
+        skills: formData.get('skills') as string,
+        visibility: (formData.get('visibility') as any) || 'public'
+    }
+
+    const validation = profileSchema.safeParse(rawData)
+    if (!validation.success) {
+        return { error: validation.error.issues[0].message }
+    }
+
+    const { data: values } = validation
 
     // Update Profile
     const { error: profileError } = await supabase
         .from('profiles')
         .update({
-            full_name: fullName,
-            username,
-            website,
-            github_url: githubUrl,
-            linkedin_url: linkedinUrl
+            full_name: values.fullName,
+            username: values.username,
+            website: values.website,
+            github_url: values.githubUrl,
+            linkedin_url: values.linkedinUrl,
+            visibility: values.visibility,
+            updated_at: new Date().toISOString()
         })
         .eq('id', user.id)
 
@@ -34,39 +64,29 @@ export async function updateProfile(formData: FormData) {
     }
 
     // Handle Portfolio Data
-    const title = formData.get('title') as string
-    const bio = formData.get('bio') as string
-    const slug = formData.get('slug') as string
-    const skills = formData.get('skills') as string
-
-    // Upsert Portfolio (we assume one per user for now, but RLS checks user_id)
-    // First check if portfolio exists to get ID, or just upsert based on user_id if we had a unique constraint on user_id?
-    // Our schema doesn't enforce unique user_id on portfolios but RLS restricts. 
-    // Let's first try to find existing portfolio.
     const { data: existing } = await supabase.from('portfolios').select('id').eq('user_id', user.id).single()
 
     let portfolioError
+    const portfolioData = {
+        title: values.title,
+        bio: values.bio,
+        slug: values.slug,
+        skills: values.skills ? values.skills.split(',').map(s => s.trim()) : [],
+        updated_at: new Date().toISOString()
+    }
+
     if (existing) {
         const { error } = await supabase
             .from('portfolios')
-            .update({
-                title,
-                bio,
-                slug,
-                skills: skills ? skills.split(',').map(s => s.trim()) : [],
-                updated_at: new Date().toISOString()
-            })
+            .update(portfolioData)
             .eq('id', existing.id)
         portfolioError = error
     } else {
         const { error } = await supabase
             .from('portfolios')
             .insert({
+                ...portfolioData,
                 user_id: user.id,
-                title,
-                bio,
-                slug,
-                skills: skills ? skills.split(',').map(s => s.trim()) : [],
             })
         portfolioError = error
     }

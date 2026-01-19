@@ -8,6 +8,11 @@ export type Project = {
     portfolio_id: string
     name: string
     description: string | null
+    long_description: string | null
+    challenges: string | null
+    solutions: string | null
+    troubleshooting: string | null
+    slug: string | null
     url: string | null
     image_url: string | null
     project_type: 'main' | 'toy'
@@ -89,11 +94,18 @@ export async function createProject(formData: FormData): Promise<{ success: bool
 
     const name = formData.get('name') as string
     const description = formData.get('description') as string | null
+    const longDescription = formData.get('longDescription') as string | null
+    const challenges = formData.get('challenges') as string | null
+    const solutions = formData.get('solutions') as string | null
+    const troubleshooting = formData.get('troubleshooting') as string | null
     const url = formData.get('url') as string | null
     const imageUrl = formData.get('imageUrl') as string | null
     const projectType = (formData.get('projectType') as 'main' | 'toy') || 'toy'
     const techStackStr = formData.get('techStack') as string | null
     const techStack = techStackStr ? techStackStr.split(',').map(s => s.trim()).filter(Boolean) : []
+
+    // Auto-generate slug from name
+    const projectSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
 
     const { error } = await supabase
         .from('projects')
@@ -102,6 +114,11 @@ export async function createProject(formData: FormData): Promise<{ success: bool
             user_id: user.id,
             name,
             description,
+            long_description: longDescription,
+            challenges,
+            solutions,
+            troubleshooting,
+            slug: projectSlug,
             url,
             image_url: imageUrl,
             project_type: projectType,
@@ -125,19 +142,43 @@ export async function updateProject(formData: FormData): Promise<{ success: bool
     }
 
     const id = formData.get('id') as string
+
+    // 소유권 검증: 프로젝트가 현재 사용자의 것인지 확인
+    const { data: project } = await supabase
+        .from('projects')
+        .select('user_id')
+        .eq('id', id)
+        .single()
+
+    if (!project || project.user_id !== user.id) {
+        return { success: false, error: 'Unauthorized' }
+    }
+
     const name = formData.get('name') as string
     const description = formData.get('description') as string | null
+    const longDescription = formData.get('longDescription') as string | null
+    const challenges = formData.get('challenges') as string | null
+    const solutions = formData.get('solutions') as string | null
+    const troubleshooting = formData.get('troubleshooting') as string | null
     const url = formData.get('url') as string | null
     const imageUrl = formData.get('imageUrl') as string | null
     const projectType = (formData.get('projectType') as 'main' | 'toy') || 'toy'
     const techStackStr = formData.get('techStack') as string | null
     const techStack = techStackStr ? techStackStr.split(',').map(s => s.trim()).filter(Boolean) : []
 
+    // Auto-generate slug from name if not provided (or just update always)
+    const projectSlug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+
     const { error } = await supabase
         .from('projects')
         .update({
             name,
             description,
+            long_description: longDescription,
+            challenges,
+            solutions,
+            troubleshooting,
+            slug: projectSlug,
             url,
             image_url: imageUrl,
             project_type: projectType,
@@ -145,6 +186,7 @@ export async function updateProject(formData: FormData): Promise<{ success: bool
             updated_at: new Date().toISOString(),
         })
         .eq('id', id)
+        .eq('user_id', user.id)
 
     if (error) {
         return { success: false, error: error.message }
@@ -162,10 +204,22 @@ export async function deleteProject(id: string): Promise<{ success: boolean; err
         return { success: false, error: 'Not authenticated' }
     }
 
+    // 소유권 검증: 프로젝트가 현재 사용자의 것인지 확인
+    const { data: project } = await supabase
+        .from('projects')
+        .select('user_id')
+        .eq('id', id)
+        .single()
+
+    if (!project || project.user_id !== user.id) {
+        return { success: false, error: 'Unauthorized' }
+    }
+
     const { error } = await supabase
         .from('projects')
         .delete()
         .eq('id', id)
+        .eq('user_id', user.id)
 
     if (error) {
         return { success: false, error: error.message }
@@ -183,12 +237,28 @@ export async function reorderProjects(orderedIds: string[]): Promise<{ success: 
         return { success: false, error: 'Not authenticated' }
     }
 
+    // 소유권 검증: 모든 프로젝트가 현재 사용자의 것인지 확인
+    const { data: projects } = await supabase
+        .from('projects')
+        .select('id, user_id')
+        .in('id', orderedIds)
+
+    if (!projects || projects.length !== orderedIds.length) {
+        return { success: false, error: 'Some projects not found' }
+    }
+
+    const allOwned = projects.every(p => p.user_id === user.id)
+    if (!allOwned) {
+        return { success: false, error: 'Unauthorized' }
+    }
+
     // Update each project's display_order
     for (let i = 0; i < orderedIds.length; i++) {
         const { error } = await supabase
             .from('projects')
             .update({ display_order: i })
             .eq('id', orderedIds[i])
+            .eq('user_id', user.id)
 
         if (error) {
             return { success: false, error: error.message }

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { ArrowLeft, Mail, Globe, MapPin, Printer, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { SmartList } from '@/components/ui/smart-list'
 
 interface ResumeViewProps {
     profile: any
@@ -68,7 +69,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                 <div className="grid grid-cols-1 gap-12">
                     {/* About */}
                     <section>
-                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-4 flex items-center gap-4">
+                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--foreground)] mb-4 flex items-center gap-4">
                             Summary <div className="h-px bg-[var(--border-color)] flex-1"></div>
                         </h2>
                         <p className="text-lg text-[var(--text-secondary)] leading-relaxed font-medium">
@@ -79,7 +80,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                     {/* Work Experience */}
                     {work.length > 0 && (
                         <section>
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-6 flex items-center gap-4">
+                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--foreground)] mb-6 flex items-center gap-4">
                                 Experience <div className="h-px bg-[var(--border-color)] flex-1"></div>
                             </h2>
                             <div className="space-y-10">
@@ -87,14 +88,15 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                                     <div key={item.id} className="group text-[var(--text-primary)]">
                                         <div className="flex justify-between items-baseline mb-2">
                                             <h3 className="text-xl font-bold text-[var(--text-primary)]">{item.company_name}</h3>
-                                            <span className="text-sm font-bold text-[var(--text-muted)] font-mono">
+                                            <span className="text-sm font-bold text-[var(--text-secondary)] font-mono">
                                                 {item.start_date.substring(0, 7)} — {item.is_current ? 'Present' : item.end_date?.substring(0, 7)}
                                             </span>
                                         </div>
                                         <p className="text-md font-black text-[var(--text-secondary)] uppercase tracking-wider mb-3 underline decoration-[var(--text-primary)] decoration-1 underline-offset-8">{item.role}</p>
-                                        <p className="text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap font-medium">
-                                            {item.description}
-                                        </p>
+                                        <SmartList
+                                            text={item.description}
+                                            className="text-[var(--text-secondary)] font-medium"
+                                        />
                                     </div>
                                 ))}
                             </div>
@@ -104,7 +106,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                     {/* Education */}
                     {education.length > 0 && (
                         <section>
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-6 flex items-center gap-4">
+                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--foreground)] mb-6 flex items-center gap-4">
                                 Education <div className="h-px bg-[var(--border-color)] flex-1"></div>
                             </h2>
                             <div className="space-y-6">
@@ -115,13 +117,13 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                                             <p className="text-[var(--text-secondary)] font-medium">
                                                 {item.degree} in {item.major}
                                                 {item.status && (
-                                                    <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] border border-[var(--border-color)] px-1.5 py-0.5 rounded">
+                                                    <span className="ml-2 text-[10px] font-black uppercase tracking-widest text-[var(--text-secondary)] border border-[var(--border-color)] px-1.5 py-0.5 rounded">
                                                         {item.status}
                                                     </span>
                                                 )}
                                             </p>
                                         </div>
-                                        <span className="text-sm font-bold text-[var(--text-muted)] font-mono">
+                                        <span className="text-sm font-bold text-[var(--text-secondary)] font-mono">
                                             {item.start_date.substring(0, 4)} — {item.is_current ? 'Present' : item.end_date?.substring(0, 4)}
                                         </span>
                                     </div>
@@ -133,7 +135,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                     {/* Skills */}
                     {Array.isArray(portfolio.skills) && portfolio.skills.length > 0 && (
                         <section>
-                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-6 flex items-center gap-4">
+                            <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--foreground)] mb-6 flex items-center gap-4">
                                 Top Skills <div className="h-px bg-[var(--border-color)] flex-1"></div>
                             </h2>
                             <div className="flex flex-wrap gap-x-6 gap-y-2">
@@ -151,7 +153,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                         {/* Awards */}
                         {awards.length > 0 && (
                             <section>
-                                <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-4 flex items-center gap-4">
+                                <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--foreground)] mb-4 flex items-center gap-4">
                                     Awards <div className="h-px bg-[var(--border-color)] flex-1"></div>
                                 </h2>
                                 <div className="space-y-4">
@@ -160,8 +162,14 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                                             <h3 className="font-bold text-[var(--text-primary)] leading-tight">{item.title}</h3>
                                             <div className="flex justify-between text-xs text-[var(--text-secondary)] font-bold mt-0.5">
                                                 <span>{item.issuer}</span>
-                                                <span className="font-mono">{item.date.substring(0, 7)}</span>
+                                                <span className="font-mono">{item.date?.substring(0, 7)}</span>
                                             </div>
+                                            {item.description && (
+                                                <SmartList
+                                                    text={item.description}
+                                                    className="mt-2 text-[var(--text-secondary)]"
+                                                />
+                                            )}
                                         </div>
                                     ))}
                                 </div>
@@ -173,7 +181,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                             <div className="space-y-12">
                                 {certifications.length > 0 && (
                                     <section>
-                                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-4 flex items-center gap-4">
+                                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--foreground)] mb-4 flex items-center gap-4">
                                             Certifications <div className="h-px bg-[var(--border-color)] flex-1"></div>
                                         </h2>
                                         <div className="space-y-4">
@@ -181,7 +189,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
                                                 <div key={item.id}>
                                                     <h3 className="font-bold text-[var(--text-primary)] leading-tight flex items-center gap-2">
                                                         {item.name}
-                                                        {item.credential_url && <ExternalLink size={10} className="text-[var(--text-muted)] print:hidden" />}
+                                                        {item.credential_url && <ExternalLink size={10} className="text-[var(--text-secondary)] print:hidden" />}
                                                     </h3>
                                                     <div className="flex justify-between text-xs text-[var(--text-secondary)] font-bold mt-0.5">
                                                         <span>{item.issuer}</span>
@@ -195,7 +203,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
 
                                 {languages.length > 0 && (
                                     <section>
-                                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--text-muted)] mb-4 flex items-center gap-4">
+                                        <h2 className="text-xs font-black uppercase tracking-[0.3em] text-[var(--foreground)] mb-4 flex items-center gap-4">
                                             Languages <div className="h-px bg-[var(--border-color)] flex-1"></div>
                                         </h2>
                                         <div className="space-y-4">
@@ -221,7 +229,7 @@ export function ResumeView({ profile, portfolio, resumeData }: ResumeViewProps) 
 
                 {/* Footer / Branding */}
                 <footer className="mt-20 pt-8 border-t border-[var(--border-color)] text-center">
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-muted)]">
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[var(--text-secondary)]">
                         Generated by My-Folio Builder &copy; {new Date().getFullYear()}
                     </p>
                 </footer>

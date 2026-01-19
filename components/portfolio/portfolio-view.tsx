@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Globe, Mail, Github, Linkedin, ExternalLink, Sparkles, ArrowRight, Edit3, FileText } from 'lucide-react'
 import { ProjectCard } from './project-card'
 import { Button } from '@/components/ui/button'
+import { SmartList } from '@/components/ui/smart-list'
 
 interface PortfolioViewProps {
     profile: any
@@ -151,38 +152,6 @@ export function PortfolioView({
                         )}
                     </motion.section>
 
-                    {/* Main Projects Grid */}
-                    {mainProjects.length > 0 && (
-                        <motion.section variants={itemVars}>
-                            <div className="flex items-baseline justify-between mb-8 border-b border-[var(--border-color)] pb-2 print:mb-6">
-                                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Work Experience / Projects</h2>
-                                <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">{mainProjects.length} Items</span>
-                            </div>
-
-                            <div className="grid grid-cols-1 gap-16 print:gap-8">
-                                {mainProjects.map((project) => (
-                                    <ProjectCardWrapper key={project.id} project={project} />
-                                ))}
-                            </div>
-                        </motion.section>
-                    )}
-
-                    {/* Toy Projects Grid */}
-                    {toyProjects.length > 0 && (
-                        <motion.section variants={itemVars}>
-                            <div className="flex items-baseline justify-between mb-8 border-b border-[var(--border-color)] pb-2 print:mb-6">
-                                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Experiments / Additional Works</h2>
-                                <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase">{toyProjects.length} Items</span>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 print:grid-cols-2">
-                                {toyProjects.map((project) => (
-                                    <ProjectCardWrapper key={project.id} project={project} type="toy" />
-                                ))}
-                            </div>
-                        </motion.section>
-                    )}
-
                     {/* Work Experience */}
                     {work.length > 0 && (
                         <motion.section variants={itemVars} className="space-y-12">
@@ -200,13 +169,55 @@ export function PortfolioView({
                                         <div className="md:col-span-3 space-y-4">
                                             <div>
                                                 <h3 className="text-3xl font-black text-[var(--text-primary)] tracking-tighter">{exp.company_name}</h3>
-                                                <p className="text-sm font-black text-[var(--accent)] uppercase tracking-[0.2em] mt-1">{exp.role}</p>
+                                                <p className="text-sm font-black text-[var(--primary)] uppercase tracking-[0.2em] mt-1">{exp.role}</p>
                                             </div>
-                                            <p className="text-lg text-[var(--text-secondary)] font-light leading-relaxed whitespace-pre-wrap">
-                                                {exp.description}
-                                            </p>
+                                            <SmartList
+                                                text={exp.description}
+                                                className="text-lg text-[var(--text-secondary)] font-light"
+                                            />
                                         </div>
                                     </div>
+                                ))}
+                            </div>
+                        </motion.section>
+                    )}
+
+                    {/* Main Projects Grid */}
+                    {mainProjects.length > 0 && (
+                        <motion.section variants={itemVars}>
+                            <div className="flex items-baseline justify-between mb-8 border-b border-[var(--border-color)] pb-2 print:mb-4">
+                                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Selected Projects</h2>
+                                <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase print:hidden">{mainProjects.length} Items</span>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-16 print:grid-cols-2 print:gap-4">
+                                {mainProjects.map((project) => (
+                                    <ProjectCardWrapper
+                                        key={project.id}
+                                        project={project}
+                                        username={profile.username}
+                                    />
+                                ))}
+                            </div>
+                        </motion.section>
+                    )}
+
+                    {/* Toy Projects Grid */}
+                    {toyProjects.length > 0 && (
+                        <motion.section variants={itemVars}>
+                            <div className="flex items-baseline justify-between mb-8 border-b border-[var(--border-color)] pb-2 print:mb-4">
+                                <h2 className="text-sm font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Experiments / Additional Works</h2>
+                                <span className="text-[10px] font-mono text-[var(--text-muted)] uppercase print:hidden">{toyProjects.length} Items</span>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 print:grid-cols-3 print:gap-3">
+                                {toyProjects.map((project) => (
+                                    <ProjectCardWrapper
+                                        key={project.id}
+                                        project={project}
+                                        username={profile.username}
+                                        type="toy"
+                                    />
                                 ))}
                             </div>
                         </motion.section>
@@ -313,7 +324,7 @@ export function PortfolioView({
                                         <div className="flex justify-between items-start gap-4 mb-4">
                                             <div>
                                                 <h3 className="text-xl font-black text-[var(--text-primary)] tracking-tight">{lang.language}</h3>
-                                                <p className="text-[var(--accent)] font-black text-xs tracking-widest uppercase">{lang.test_name}</p>
+                                                <p className="text-[var(--primary)] font-black text-xs tracking-widest uppercase">{lang.test_name}</p>
                                             </div>
                                             <div className="bg-[var(--color-surface)] text-[var(--text-primary)] border border-[var(--border-color)] px-3 py-1 rounded-full text-sm font-bold whitespace-nowrap group-hover:bg-[var(--accent)] group-hover:text-white group-hover:border-[var(--accent)] transition-colors">
                                                 {lang.score}
@@ -351,71 +362,78 @@ export function PortfolioView({
     )
 }
 
-function ProjectCardWrapper({ project, type = 'main' }: { project: any, type?: 'main' | 'toy' }) {
+function ProjectCardWrapper({ project, username, type = 'main' }: { project: any, username: string, type?: 'main' | 'toy' }) {
     if (type === 'toy') {
         return (
             <div className="group block break-inside-avoid">
-                <div className="aspect-[4/3] bg-[var(--card-bg)] border border-[var(--border-color)] mb-4 overflow-hidden rounded-sm relative group-hover:border-[var(--accent)] transition-all">
-                    {/* Image placeholder or real image */}
-                    {project.image_url ? (
-                        <img src={project.image_url} alt={project.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
-                    ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-[var(--bg-portfolio)] to-[var(--card-bg)] flex items-center justify-center">
-                            <div className="w-12 h-12 rounded-full bg-white/10 border border-[var(--border-color)] flex items-center justify-center">
-                                <Sparkles className="w-5 h-5 text-[var(--text-secondary)]" />
+                {!project.image_url ? (
+                    <div className="bg-[var(--card-bg)] border border-[var(--border-color)] p-6 rounded-2xl transition-all hover:border-[var(--accent)] hover:shadow-xl hover:shadow-blue-500/5 group relative">
+                        <div className="flex justify-between items-start mb-2">
+                            <h3 className="font-bold text-lg text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">{project.name}</h3>
+                            <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                {project.long_description && (
+                                    <Link href={`/${username}/project/${project.slug || project.id}`} className="p-1.5 bg-[var(--color-surface)] text-[var(--text-secondary)] rounded-full hover:text-[var(--primary)]" title="Case Study">
+                                        <Sparkles size={14} />
+                                    </Link>
+                                )}
+                                {project.url && (
+                                    <a href={project.url} target="_blank" className="p-1.5 bg-[var(--color-surface)] text-[var(--text-secondary)] rounded-full hover:text-[var(--primary)]">
+                                        <ExternalLink size={14} />
+                                    </a>
+                                )}
                             </div>
                         </div>
-                    )}
-                    {project.url && (
-                        <a href={project.url} target="_blank" className="absolute bottom-4 right-4 p-2 bg-[var(--bg-portfolio)] text-[var(--text-primary)] rounded-full opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all shadow-sm print:hidden border border-[var(--border-color)]">
-                            <ExternalLink size={16} />
-                        </a>
-                    )}
-                </div>
-                <h3 className="font-bold text-lg mb-1 text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">{project.name}</h3>
-                <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-3 line-clamp-2">{project.description}</p>
-                <div className="flex flex-wrap gap-2">
-                    {project.tech_stack?.slice(0, 3).map((t: string) => (
-                        <span key={t} className="text-xs text-[var(--text-secondary)] opacity-60"># {t}</span>
-                    ))}
-                </div>
+                        <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-4 line-clamp-3 font-light">{project.description}</p>
+                        <div className="flex flex-wrap gap-2">
+                            {project.tech_stack?.slice(0, 3).map((t: string) => (
+                                <span key={t} className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)]"># {t}</span>
+                            ))}
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        <div className="aspect-[4/3] bg-[var(--card-bg)] border border-[var(--border-color)] mb-4 overflow-hidden rounded-2xl relative group-hover:border-[var(--accent)] transition-all">
+                            <img src={project.image_url} alt={project.name} className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" />
+                            <div className="absolute bottom-4 right-4 flex gap-2 opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all">
+                                {project.long_description && (
+                                    <Link href={`/${username}/project/${project.id}`} className="p-2 bg-[var(--bg-portfolio)] text-[var(--text-primary)] rounded-full shadow-sm border border-[var(--border-color)] hover:text-[var(--primary)]" title="Case Study">
+                                        <Sparkles size={16} />
+                                    </Link>
+                                )}
+                                {project.url && (
+                                    <a href={project.url} target="_blank" className="p-2 bg-[var(--bg-portfolio)] text-[var(--text-primary)] rounded-full shadow-sm border border-[var(--border-color)] hover:text-[var(--primary)]">
+                                        <ExternalLink size={16} />
+                                    </a>
+                                )}
+                            </div>
+                        </div>
+                        <h3 className="font-bold text-lg mb-1 text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">{project.name}</h3>
+                        <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-3 line-clamp-2">{project.description}</p>
+                        <div className="flex flex-wrap gap-2">
+                            {project.tech_stack?.slice(0, 3).map((t: string) => (
+                                <span key={t} className="text-xs text-[var(--text-secondary)] opacity-60"># {t}</span>
+                            ))}
+                        </div>
+                    </>
+                )}
             </div>
         )
     }
 
-    // Main Project Layout (Horizontal or Big Card)
+    // Main Project Layout
     return (
-        <div className="group grid grid-cols-1 md:grid-cols-12 gap-8 items-start break-inside-avoid">
-            <div className="md:col-span-7 aspect-video bg-[var(--card-bg)] border border-[var(--border-color)] rounded-sm overflow-hidden relative group-hover:border-[var(--accent)] transition-all">
-                {project.image_url ? (
-                    <img src={project.image_url} alt={project.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[var(--bg-portfolio)] to-[var(--card-bg)] flex items-center justify-center">
-                        <div className="w-16 h-16 rounded-3xl bg-white/10 border border-[var(--border-color)] flex items-center justify-center shadow-sm">
-                            <Sparkles className="w-8 h-8 text-[var(--text-secondary)] opacity-40" />
-                        </div>
-                    </div>
-                )}
-            </div>
-            <div className="md:col-span-5 flex flex-col h-full justify-center space-y-4">
-                <h3 className="text-3xl font-bold tracking-tight text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">{project.name}</h3>
-                <p className="text-[var(--text-secondary)] leading-relaxed text-lg font-light">
-                    {project.description}
-                </p>
-
-                <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm font-medium text-[var(--text-secondary)] opacity-70 pt-2">
-                    {project.tech_stack?.map((t: string) => (
-                        <span key={t}>/ {t}</span>
-                    ))}
-                </div>
-
-                {project.url && (
-                    <a href={project.url} target="_blank" className="inline-flex items-center gap-2 text-[var(--text-primary)] text-sm font-bold uppercase tracking-widest mt-4 hover:gap-3 transition-all print:hidden">
-                        View Project <ArrowRight size={16} />
-                    </a>
-                )}
-            </div>
-        </div>
+        <ProjectCard
+            name={project.name}
+            description={project.description}
+            url={project.url}
+            imageUrl={project.image_url}
+            techStack={project.tech_stack}
+            type={type}
+            username={username}
+            projectId={project.id}
+            slug={project.slug}
+            hasCaseStudy={!!project.long_description}
+        />
     )
 }
 

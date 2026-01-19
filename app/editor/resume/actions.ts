@@ -93,143 +93,110 @@ export async function getResumeData(portfolioId: string) {
 }
 
 /**
+ * Helper to sanitize resume items before saving to DB
+ * - Trims all strings
+ * - Converts empty strings to null (especially important for DATE/UUID columns)
+ */
+function sanitizeItems<T extends Record<string, any>>(items: T[]): T[] {
+    return items.map(item => {
+        const cleaned = { ...item } as any
+        Object.keys(cleaned).forEach(key => {
+            const val = cleaned[key]
+            if (typeof val === 'string') {
+                const trimmed = val.trim()
+                cleaned[key] = trimmed === '' ? null : trimmed
+            }
+        })
+        return cleaned as T
+    })
+}
+
+/**
  * WORK EXPERIENCE ACTIONS
  */
-export async function updateWorkExperience(portfolioId: string, items: any[]) {
+export async function updateWorkExperience(portfolioId: string, items: WorkExperience[]) {
     const supabase = await createClient()
-
-    // Simplified approach: Delete and re-insert for the demo-like scale, 
-    // or properly upsert. Let's do a more robust upsert/delete logic.
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) return { error: 'Not authenticated' }
 
-    // First delete items not in the new list
-    const incomingIds = items.filter(i => i.id).map(i => i.id)
-    if (incomingIds.length > 0) {
-        await supabase.from('work_experiences').delete().eq('portfolio_id', portfolioId).not('id', 'in', `(${incomingIds.join(',')})`)
-    } else {
-        await supabase.from('work_experiences').delete().eq('portfolio_id', portfolioId)
-    }
+    const sanitized = sanitizeItems(items)
 
-    // Upsert remaining
-    const { error } = await supabase.from('work_experiences').upsert(
-        items.map((item, index) => ({
-            ...item,
-            portfolio_id: portfolioId,
-            display_order: index,
-            id: item.id || undefined // Let Postgres generate if new
-        }))
-    )
+    // Use transactional RPC to avoid data loss
+    const { error } = await supabase.rpc('update_resume_items', {
+        p_portfolio_id: portfolioId,
+        p_table_name: 'work_experiences',
+        p_items: sanitized
+    })
 
     if (error) return { error: error.message }
-    revalidatePath('/editor')
+    revalidatePath('/editor/resume')
     return { success: true }
 }
 
 /**
  * EDUCATION ACTIONS
  */
-export async function updateEducation(portfolioId: string, items: any[]) {
+export async function updateEducation(portfolioId: string, items: Education[]) {
     const supabase = await createClient()
-    const incomingIds = items.filter(i => i.id).map(i => i.id)
-
-    if (incomingIds.length > 0) {
-        await supabase.from('educations').delete().eq('portfolio_id', portfolioId).not('id', 'in', `(${incomingIds.join(',')})`)
-    } else {
-        await supabase.from('educations').delete().eq('portfolio_id', portfolioId)
-    }
-
-    const { error } = await supabase.from('educations').upsert(
-        items.map((item, index) => ({
-            ...item,
-            portfolio_id: portfolioId,
-            display_order: index,
-            id: item.id || undefined
-        }))
-    )
+    const sanitized = sanitizeItems(items)
+    const { error } = await supabase.rpc('update_resume_items', {
+        p_portfolio_id: portfolioId,
+        p_table_name: 'educations',
+        p_items: sanitized
+    })
 
     if (error) return { error: error.message }
-    revalidatePath('/editor')
+    revalidatePath('/editor/resume')
     return { success: true }
 }
 
 /**
  * AWARD ACTIONS
  */
-export async function updateAwards(portfolioId: string, items: any[]) {
+export async function updateAwards(portfolioId: string, items: Award[]) {
     const supabase = await createClient()
-    const incomingIds = items.filter(i => i.id).map(i => i.id)
-
-    if (incomingIds.length > 0) {
-        await supabase.from('awards').delete().eq('portfolio_id', portfolioId).not('id', 'in', `(${incomingIds.join(',')})`)
-    } else {
-        await supabase.from('awards').delete().eq('portfolio_id', portfolioId)
-    }
-
-    const { error } = await supabase.from('awards').upsert(
-        items.map((item, index) => ({
-            ...item,
-            portfolio_id: portfolioId,
-            display_order: index,
-            id: item.id || undefined
-        }))
-    )
+    const sanitized = sanitizeItems(items)
+    const { error } = await supabase.rpc('update_resume_items', {
+        p_portfolio_id: portfolioId,
+        p_table_name: 'awards',
+        p_items: sanitized
+    })
 
     if (error) return { error: error.message }
-    revalidatePath('/editor')
+    revalidatePath('/editor/resume')
     return { success: true }
 }
 
 /**
  * CERTIFICATION ACTIONS
  */
-export async function updateCertifications(portfolioId: string, items: any[]) {
+export async function updateCertifications(portfolioId: string, items: Certification[]) {
     const supabase = await createClient()
-    const incomingIds = items.filter(i => i.id).map(i => i.id)
-
-    if (incomingIds.length > 0) {
-        await supabase.from('certifications').delete().eq('portfolio_id', portfolioId).not('id', 'in', `(${incomingIds.join(',')})`)
-    } else {
-        await supabase.from('certifications').delete().eq('portfolio_id', portfolioId)
-    }
-
-    const { error } = await supabase.from('certifications').upsert(
-        items.map((item, index) => ({
-            ...item,
-            portfolio_id: portfolioId,
-            display_order: index,
-            id: item.id || undefined
-        }))
-    )
+    const sanitized = sanitizeItems(items)
+    const { error } = await supabase.rpc('update_resume_items', {
+        p_portfolio_id: portfolioId,
+        p_table_name: 'certifications',
+        p_items: sanitized
+    })
 
     if (error) return { error: error.message }
-    revalidatePath('/editor')
+    revalidatePath('/editor/resume')
     return { success: true }
 }
 
 /**
  * LANGUAGE CERTIFICATION ACTIONS
  */
-export async function updateLanguageCerts(portfolioId: string, items: any[]) {
+export async function updateLanguageCerts(portfolioId: string, items: LanguageCertification[]) {
     const supabase = await createClient()
-    const incomingIds = items.filter(i => i.id).map(i => i.id)
-
-    if (incomingIds.length > 0) {
-        await supabase.from('language_certs').delete().eq('portfolio_id', portfolioId).not('id', 'in', `(${incomingIds.join(',')})`)
-    } else {
-        await supabase.from('language_certs').delete().eq('portfolio_id', portfolioId)
-    }
-
-    const { error } = await supabase.from('language_certs').upsert(
-        items.map((item, index) => ({
-            ...item,
-            portfolio_id: portfolioId,
-            display_order: index,
-            id: item.id || undefined
-        }))
-    )
+    const sanitized = sanitizeItems(items)
+    const { error } = await supabase.rpc('update_resume_items', {
+        p_portfolio_id: portfolioId,
+        p_table_name: 'language_certs',
+        p_items: sanitized
+    })
 
     if (error) return { error: error.message }
-    revalidatePath('/editor')
+    revalidatePath('/editor/resume')
     return { success: true }
 }
